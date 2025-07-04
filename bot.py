@@ -3,7 +3,8 @@ import random
 import json
 
 # 🔑 Вставь сюда свой токен от BotFather
-TOKEN = 'BOT_TOKEN'
+import os
+TOKEN = os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
 
 # 📚 Загрузка мудростей из файла JSON
