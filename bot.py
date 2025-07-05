@@ -6,6 +6,7 @@ import sqlite3
 from datetime import datetime
 from flask import Flask
 import threading
+ADMIN_ID = 708145081
 
 # 🔑 Токен из переменной окружения
 TOKEN = os.getenv("BOT_TOKEN")
