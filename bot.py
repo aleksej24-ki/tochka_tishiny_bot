@@ -2,7 +2,7 @@ import telebot import random import json import os import sqlite3 from datetime 
 
 TOKEN = os.getenv("BOT_TOKEN") bot = telebot.TeleBot(TOKEN)
 
-ADMIN_ID = 123456789  # Замени на свой Telegram ID
+ADMIN_ID = 708145081  # Замени на свой Telegram ID
 
 📃 Загрузка цитат
 
@@ -128,5 +128,3 @@ def run_web(): app.run(host="0.0.0.0", port=10000)
 threading.Thread(target=run_web).start()
 
 bot.polling()
-
- 
