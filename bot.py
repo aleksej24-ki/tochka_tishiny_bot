@@ -53,6 +53,20 @@ def save_parable_text(message):
 @bot.message_handler(commands=['count_parables'])
 def count_parables(message):
     if message.from_user.id != ADMIN_ID:
+        return
+    import sqlite3
+    conn = sqlite3.connect("users.db")
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM parables")
+    count = cur.fetchone()[0]
+    conn.close()
+    bot.send_message(message.chat.id, f"📖 В базе {count} притч.")
+
+
+
+@bot.message_handler(commands=['count_parables'])
+def count_parables(message):
+    if message.from_user.id != ADMIN_ID:
         bot.reply_to(message, "🚫 Нет доступа.")
         return
     try:
