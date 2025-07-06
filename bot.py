@@ -46,10 +46,30 @@ def add_parable_command(message):
         return
     msg = bot.send_message(message.chat.id, "✍️ Введи текст новой притчи:")
     bot.register_next_step_handler(msg, save_parable_text)
-
+    
 def save_parable_text(message):
     add_parable(message.text.strip())
     bot.send_message(message.chat.id, "✅ Притча добавлена!")
+
+
+import sqlite3
+import os
+
+def import_sql_dump():
+    path = "import_parables.sql"
+    if not os.path.exists(path):
+        print("❌ SQL-файл не найден")
+        return
+    with open(path, "r", encoding="utf-8") as f:
+        sql_script = f.read()
+    conn = sqlite3.connect("users.db")
+    conn.executescript(sql_script)
+    conn.commit()
+    conn.close()
+    print("✅ Притчи импортированы")
+
+import_sql_dump()  # ← обязательно вызови
+
 
 
 @bot.message_handler(commands=['count_parables'])
