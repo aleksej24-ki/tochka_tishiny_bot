@@ -7,6 +7,8 @@ import threading
 from utils.db import init_db, save_user
 from utils.wisdom import get_random_wisdom, load_wisdoms, add_wisdom
 from utils.parables import create_parables_table, get_random_parable, add_parable
+from utils.parables import get_parables_count
+
 
 TOKEN = os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
@@ -53,18 +55,10 @@ def save_parable_text(message):
 @bot.message_handler(commands=['count_parables'])
 def count_parables(message):
     if message.from_user.id != ADMIN_ID:
-        bot.reply_to(message, "🚫 Нет доступа.")
         return
-    try:
-        import sqlite3
-        conn = sqlite3.connect("users.db")
-        cur = conn.cursor()
-        cur.execute("SELECT COUNT(*) FROM parables")
-        count = cur.fetchone()[0]
-        conn.close()
-        bot.send_message(message.chat.id, f"📖 В базе {count} притч.")
-    except Exception as e:
-        bot.send_message(message.chat.id, f"⚠️ Ошибка: {str(e)}")
+    count = get_parables_count()
+    bot.send_message(message.chat.id, f"📖 В базе {count} притч.")
+
 
 
 @bot.message_handler(func=lambda message: True)
