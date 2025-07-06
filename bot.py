@@ -13,23 +13,6 @@ bot = telebot.TeleBot(TOKEN)
 
 ADMIN_ID = 708145081
 
-import sqlite3
-
-def import_sql_dump():
-    sql_path = "import_parables.sql"
-    if not os.path.exists(sql_path):
-        return
-    with open(sql_path, "r", encoding="utf-8") as f:
-        sql_script = f.read()
-    conn = sqlite3.connect("users.db")
-    conn.executescript(sql_script)
-    conn.commit()
-    conn.close()
-    print("✅ Притчи импортированы!")
-
-import_sql_dump()
-
-
 init_db()
 create_parables_table()
 
@@ -65,6 +48,20 @@ def add_parable_command(message):
 def save_parable_text(message):
     add_parable(message.text.strip())
     bot.send_message(message.chat.id, "✅ Притча добавлена!")
+
+
+@bot.message_handler(commands=['count_parables'])
+def count_parables(message):
+    if message.from_user.id != ADMIN_ID:
+        return
+    import sqlite3
+    conn = sqlite3.connect("users.db")
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM parables")
+    count = cur.fetchone()[0]
+    conn.close()
+    bot.send_message(message.chat.id, f"📖 В базе {count} притч.")
+
 
 
 @bot.message_handler(func=lambda message: True)
