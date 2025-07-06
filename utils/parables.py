@@ -28,3 +28,12 @@ def get_random_parable():
     row = cur.fetchone()
     conn.close()
     return row[0] if row else "😔 Притчи пока нет."
+
+def get_parables_count():
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM parables")
+    count = cur.fetchone()[0]
+    conn.close()
+    return count
+
