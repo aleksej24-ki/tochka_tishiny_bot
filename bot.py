@@ -21,9 +21,10 @@ def send_welcome(message):
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add(
         KeyboardButton("🧘 Получить истину"),
-        KeyboardButton("📜 Все мудрости")
+       # KeyboardButton("📜 Все мудрости")
     )
     if message.from_user.id == ADMIN_ID:
+        markup.add(KeyboardButton("📜 Все мудрости"))
         markup.add(KeyboardButton("📝 Добавить мудрость"))
 
     bot.send_message(
