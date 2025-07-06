@@ -28,8 +28,7 @@ def send_welcome(message):
 
     bot.send_message(
         message.chat.id,
-        "Добро пожаловать в *Точку тишины*.
-Выберите, что хотите:",
+        "Добро пожаловать в *Точку тишины*. Выберите, что хотите:",
         parse_mode="Markdown",
         reply_markup=markup
     )
