@@ -22,15 +22,3 @@ def add_wisdom(text):
 def get_random_wisdom():
     wisdoms = load_wisdoms()
     return random.choice(wisdoms)
-
-def search_wisdoms(keyword):
-    wisdoms = load_wisdoms()
-    return [f"{i+1}. {w}" for i, w in enumerate(wisdoms) if keyword in w.lower()]
-
-def delete_wisdom_by_index(index):
-    wisdoms = load_wisdoms()
-    if 0 <= index < len(wisdoms):
-        removed = wisdoms.pop(index)
-        save_wisdoms(wisdoms)
-        return removed
-    return None

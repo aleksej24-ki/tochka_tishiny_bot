@@ -33,11 +33,3 @@ def save_user(user):
     ))
     conn.commit()
     conn.close()
-
-def get_all_users():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, username, first_name, last_name, date_joined FROM users")
-    users = cursor.fetchall()
-    conn.close()
-    return users
