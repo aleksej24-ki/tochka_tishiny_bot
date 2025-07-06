@@ -6,6 +6,7 @@ import threading
 
 from utils.db import init_db, save_user
 from utils.wisdom import get_random_wisdom, load_wisdoms, add_wisdom
+from utils.parables import create_parables_table, get_random_parable, add_parable
 
 TOKEN = os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
@@ -13,6 +14,7 @@ bot = telebot.TeleBot(TOKEN)
 ADMIN_ID = 708145081
 
 init_db()
+create_parables_table()
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -21,7 +23,8 @@ def send_welcome(message):
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add(
         KeyboardButton("🧘 Получить истину"),
-       # KeyboardButton("📜 Все мудрости")
+        KeyboardButton("📖 Притча")
+
     )
     if message.from_user.id == ADMIN_ID:
         markup.add(KeyboardButton("📜 Все мудрости"))
@@ -33,6 +36,19 @@ def send_welcome(message):
         parse_mode="Markdown",
         reply_markup=markup
     )
+
+@bot.message_handler(commands=['add_parable'])
+def add_parable_command(message):
+    if message.from_user.id != ADMIN_ID:
+        bot.reply_to(message, "🚫 Только админ может добавлять притчи.")
+        return
+    msg = bot.send_message(message.chat.id, "✍️ Введи текст новой притчи:")
+    bot.register_next_step_handler(msg, save_parable_text)
+
+def save_parable_text(message):
+    add_parable(message.text.strip())
+    bot.send_message(message.chat.id, "✅ Притча добавлена!")
+
 
 @bot.message_handler(func=lambda message: True)
 def handle_buttons(message):
@@ -59,8 +75,12 @@ def handle_buttons(message):
         else:
             bot.send_message(message.chat.id, "🚫 Только админ может добавлять.")
 
+    elif text == "📖 Притча":
+        bot.send_message(message.chat.id, get_random_parable())
+
     else:
         bot.send_message(message.chat.id, "Нажми кнопку ниже или напиши '🧘 Получить истину'.")
+
 
 def receive_wisdom(message):
     new_text = message.text.strip()
