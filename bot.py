@@ -13,6 +13,23 @@ bot = telebot.TeleBot(TOKEN)
 
 ADMIN_ID = 708145081
 
+import sqlite3
+
+def import_sql_dump():
+    sql_path = "import_parables.sql"
+    if not os.path.exists(sql_path):
+        return
+    with open(sql_path, "r", encoding="utf-8") as f:
+        sql_script = f.read()
+    conn = sqlite3.connect("users.db")
+    conn.executescript(sql_script)
+    conn.commit()
+    conn.close()
+    print("✅ Притчи импортированы!")
+
+import_sql_dump()
+
+
 init_db()
 create_parables_table()
 
