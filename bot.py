@@ -47,7 +47,7 @@ def handle_buttons(message):
             bot.send_message(message.chat.id, f"🧘 Все мудрости:\n\n{full}")
         else:
             with open("wisdoms_list.txt", "w", encoding="utf-8") as f:
-                f.write("\n".join(wisdoms))
+                f.write("\n\n".join([f"{i+1}. {w}" for i, w in enumerate(wisdoms)]))
             with open("wisdoms_list.txt", "rb") as f_send:
                 bot.send_document(message.chat.id, f_send)
 
