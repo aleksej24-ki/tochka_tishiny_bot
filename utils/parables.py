@@ -37,3 +37,4 @@ def get_parables_count():
     conn.close()
     return count
 
+
