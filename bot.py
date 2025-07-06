@@ -6,7 +6,7 @@ import threading
 
 from utils.db import init_db, save_user
 from utils.wisdom import get_random_wisdom, load_wisdoms, add_wisdom
-from utils.parables import create_parables_table, get_random_parable, add_parable,
+from utils.parables import create_parables_table, get_random_parable, add_parable
 from utils.parables import  get_parables_count
 
 
