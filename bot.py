@@ -50,25 +50,6 @@ def save_parable_text(message):
     bot.send_message(message.chat.id, "✅ Притча добавлена!")
 
 
-import sqlite3
-
-def import_sql_dump():
-    sql_path = "import_parables.sql"
-    if not os.path.exists(sql_path):
-        return
-    with open(sql_path, "r", encoding="utf-8") as f:
-        sql_script = f.read()
-    conn = sqlite3.connect("users.db")
-    conn.executescript(sql_script)
-    conn.commit()
-    conn.close()
-    print("✅ Притчи импортированы!")
-
-import_sql_dump()
-
-
-
-
 @bot.message_handler(commands=['count_parables'])
 def count_parables(message):
     if message.from_user.id != ADMIN_ID:
