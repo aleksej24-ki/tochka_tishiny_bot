@@ -1,32 +1,34 @@
+import psycopg2
+import os
+from dotenv import load_dotenv
 
-from utils.db import get_connection
+load_dotenv()
 
-def create_parables_table():
+DB_URL = os.getenv("DATABASE_URL")
+
+def get_connection():
+    return psycopg2.connect(DB_URL)
+
+def init_db():
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
-                CREATE TABLE IF NOT EXISTS parables (
-                    id SERIAL PRIMARY KEY,
-                    text TEXT NOT NULL
+                CREATE TABLE IF NOT EXISTS users (
+                    id BIGINT PRIMARY KEY,
+                    username TEXT,
+                    first_name TEXT,
+                    last_name TEXT,
+                    date_joined TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
         conn.commit()
 
-def add_parable(text):
+def save_user(user):
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("INSERT INTO parables (text) VALUES (%s)", (text,))
+            cur.execute("""
+                INSERT INTO users (id, username, first_name, last_name)
+                VALUES (%s, %s, %s, %s)
+                ON CONFLICT (id) DO NOTHING
+            """, (user.id, user.username, user.first_name, user.last_name))
         conn.commit()
-
-def get_random_parable():
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT text FROM parables ORDER BY RANDOM() LIMIT 1")
-            row = cur.fetchone()
-            return row[0] if row else "😔 Притчи пока нет."
-
-def get_parables_count():
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT COUNT(*) FROM parables")
-            return cur.fetchone()[0]
