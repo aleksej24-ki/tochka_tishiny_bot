@@ -5,7 +5,7 @@ from flask import Flask
 import threading
 
 from utils.supabase_users import save_user
-from utils.supabase_parables import get_random_parable, add_parable
+from utils.supabase_parables import get_random_parable
 from utils.wisdom import get_random_wisdom, load_wisdoms, add_wisdom
 
 TOKEN = os.getenv("BOT_TOKEN")
