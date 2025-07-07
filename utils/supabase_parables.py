@@ -13,6 +13,7 @@ def add_parable(text):
     conn.close()
 
 def get_random_parable():
+    print("🔄 Получение случайной притчи из Supabase...")
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("SELECT text FROM parables ORDER BY RANDOM() LIMIT 1;")
