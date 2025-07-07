@@ -1,35 +1,32 @@
-import sqlite3
-from datetime import datetime
 
-DB_PATH = "users.db"
+from utils.db import get_connection
 
-def init_db():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY,
-            username TEXT,
-            first_name TEXT,
-            last_name TEXT,
-            date_joined TEXT
-        )
-    """)
-    conn.commit()
-    conn.close()
+def create_parables_table():
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS parables (
+                    id SERIAL PRIMARY KEY,
+                    text TEXT NOT NULL
+                )
+            """)
+        conn.commit()
 
-def save_user(user):
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("""
-        INSERT OR IGNORE INTO users (id, username, first_name, last_name, date_joined)
-        VALUES (?, ?, ?, ?, ?)
-    """, (
-        user.id,
-        user.username,
-        user.first_name,
-        user.last_name,
-        datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    ))
-    conn.commit()
-    conn.close()
+def add_parable(text):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("INSERT INTO parables (text) VALUES (%s)", (text,))
+        conn.commit()
+
+def get_random_parable():
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT text FROM parables ORDER BY RANDOM() LIMIT 1")
+            row = cur.fetchone()
+            return row[0] if row else "😔 Притчи пока нет."
+
+def get_parables_count():
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT COUNT(*) FROM parables")
+            return cur.fetchone()[0]
