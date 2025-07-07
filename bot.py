@@ -45,7 +45,13 @@ def handle_buttons(message):
         bot.send_message(message.chat.id, f"🕯 {get_random_wisdom()}")
 
     elif text == "📖 Притча":
-        bot.send_message(message.chat.id, get_random_parable())
+    try:
+        parable = get_random_parable()
+        bot.send_message(message.chat.id, parable)
+    except Exception as e:
+        bot.send_message(message.chat.id, "❗️ Ошибка при получении притчи.")
+        print("Ошибка при получении притчи:", e)
+
 
     elif text == "📜 Все мудрости":
         wisdoms = load_wisdoms()
