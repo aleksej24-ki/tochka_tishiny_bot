@@ -1,3 +1,16 @@
+import os
+import random
+import psycopg2
+
+
+def get_connection():
+    db_url = os.getenv("SUPABASE_DB_URL")
+    print("📡 SUPABASE_DB_URL:", db_url)  # 👈 Добавь эту строку
+    if not db_url:
+        raise Exception("❌ SUPABASE_DB_URL не найден в переменных окружения!")
+    return psycopg2.connect(db_url)
+
+
 def get_random_parable():
     try:
         print("🔄 Получение случайной притчи из базы...")
