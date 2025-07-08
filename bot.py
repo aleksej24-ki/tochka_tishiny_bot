@@ -11,6 +11,10 @@ BOT_TOKEN = os.getenv("TELEGRAM_TOKEN")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")  # Пример: https://your-app.onrender.com
 
 bot = telebot.TeleBot(BOT_TOKEN)
+
+bot.remove_webhook()
+bot.set_webhook(url="https://tochka-tishiny-bot.onrender.com/" + TOKEN)
+
 app = Flask(__name__)
 
 # Обработка команды /start
