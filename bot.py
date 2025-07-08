@@ -1,104 +1,56 @@
-import telebot
+
 import os
+import telebot
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
-from flask import Flask
-import threading
-
-from utils.supabase_users import save_user
+from flask import Flask, request
 from utils.supabase_parables import get_random_parable
-from utils.wisdom import get_random_wisdom, load_wisdoms, add_wisdom
+from utils.wisdom import get_random_wisdom
 
-TOKEN = os.getenv("BOT_TOKEN")
-ADMIN_ID = int(os.getenv("ADMIN_ID", "708145081"))
+# Получение токена и URL из переменных окружения
+BOT_TOKEN = os.getenv("TELEGRAM_TOKEN")
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")  # Пример: https://your-app.onrender.com
 
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot(BOT_TOKEN)
+app = Flask(__name__)
 
-@bot.message_handler(commands=['start'])
+# Обработка команды /start
+@bot.message_handler(commands=["start"])
 def send_welcome(message):
-    save_user(message.from_user)
-
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add(
-        KeyboardButton("🧘 Получить истину"),
-        KeyboardButton("📖 Притча")
-    )
-    if message.from_user.id == ADMIN_ID:
-        markup.add(
-            KeyboardButton("📜 Все мудрости"),
-            KeyboardButton("📝 Добавить мудрость"),
-            KeyboardButton("➕ Добавить притчу"),
-            KeyboardButton("📊 Кол-во притч")
-        )
-
+    markup.add(KeyboardButton("🧘 Получить истину"), KeyboardButton("📖 Притча"))
     bot.send_message(
         message.chat.id,
-        "Добро пожаловать в *Точку тишины*. Выберите, что хотите:",
+        "Добро пожаловать в *Точку тишины*. Выберите:",
         parse_mode="Markdown",
         reply_markup=markup
     )
 
-@bot.message_handler(func=lambda message: True)
-def handle_buttons(message):
-    text = message.text
+# Кнопка — Получить истину
+@bot.message_handler(func=lambda msg: msg.text == "🧘 Получить истину")
+def send_wisdom(msg):
+    text = get_random_wisdom()
+    bot.send_message(msg.chat.id, f"🕯 {text}")
 
-    if text == "🧘 Получить истину":
-        bot.send_message(message.chat.id, f"🕯 {get_random_wisdom()}")
+# Кнопка — Притча
+@bot.message_handler(func=lambda msg: msg.text == "📖 Притча")
+def send_parable(msg):
+    text = get_random_parable()
+    bot.send_message(msg.chat.id, f"📖 {text}")
 
-    elif text == "📖 Притча":
-        try:
-            parable = get_random_parable()
-            bot.send_message(message.chat.id, parable)
-        except Exception as e:
-            bot.send_message(message.chat.id, "❗️ Ошибка при получении притчи.")
-            print("Ошибка при получении притчи:", e)
+# Webhook endpoint
+@app.route(f"/{BOT_TOKEN}", methods=["POST"])
+def webhook():
+    update = telebot.types.Update.de_json(request.get_json())
+    bot.process_new_updates([update])
+    return "ok", 200
 
+# Проверка доступности
+@app.route("/", methods=["GET"])
+def index():
+    return "Бот работает!", 200
 
-    elif text == "📜 Все мудрости":
-        wisdoms = load_wisdoms()
-        if len(wisdoms) < 15:
-            full = "\n\n".join([f"{i+1}. {w}" for i, w in enumerate(wisdoms)])
-            bot.send_message(message.chat.id, f"🧘 Все мудрости:\n\n{full}")
-        else:
-            with open("wisdoms_list.txt", "w", encoding="utf-8") as f:
-                f.write("\n\n".join([f"{i+1}. {w}" for i, w in enumerate(wisdoms)]))
-            with open("wisdoms_list.txt", "rb") as f_send:
-                bot.send_document(message.chat.id, f_send)
-
-    elif text == "📝 Добавить мудрость" and message.from_user.id == ADMIN_ID:
-        msg = bot.send_message(message.chat.id, "✍️ Напиши текст новой мудрости:")
-        bot.register_next_step_handler(msg, receive_wisdom)
-
-    elif text == "➕ Добавить притчу" and message.from_user.id == ADMIN_ID:
-        msg = bot.send_message(message.chat.id, "✍️ Введи текст новой притчи:")
-        bot.register_next_step_handler(msg, receive_parable)
-
-    elif text == "📊 Кол-во притч" and message.from_user.id == ADMIN_ID:
-        count = count_parables()
-        bot.send_message(message.chat.id, f"📚 Всего притч в базе: {count}")
-
-    else:
-        bot.send_message(message.chat.id, "Нажми кнопку ниже или напиши '🧘 Получить истину'.")
-
-def receive_wisdom(message):
-    text = message.text.strip()
-    if add_wisdom(text):
-        bot.send_message(message.chat.id, "✅ Мудрость добавлена!")
-    else:
-        bot.send_message(message.chat.id, "⚠️ Такая уже есть.")
-
-def receive_parable(message):
-    text = message.text.strip()
-    add_parable(text)
-    bot.send_message(message.chat.id, "✅ Притча добавлена.")
-
-# Flask сервер
-app = Flask(__name__)
-@app.route('/')
-def home():
-    return "I'm alive!"
-
-def run_web():
-    app.run(host="0.0.0.0", port=10000)
-
-threading.Thread(target=run_web).start()
-bot.polling(none_stop=True)
+# Устанавливаем webhook при запуске сервера
+@app.before_first_request
+def setup_webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url=f"{WEBHOOK_URL}/{BOT_TOKEN}")
