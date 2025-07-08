@@ -50,8 +50,7 @@ def index():
     return "Бот работает!", 200
 
 # Устанавливаем webhook при запуске сервера
-
 if __name__ == "__main__":
     bot.remove_webhook()
-    bot.set_webhook(url=f"{WEBHOOK_URL}/{TOKEN}")
+    bot.set_webhook(url=f"{os.getenv('WEBHOOK_URL')}/{TOKEN}")
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
