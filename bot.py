@@ -64,4 +64,7 @@ def index():
 if __name__ == "__main__":
     bot.remove_webhook()
     bot.set_webhook(url=f"{WEBHOOK_URL}/{BOT_TOKEN}")
+    @bot.message_handler(func=lambda message: True)
+        def echo_all(message):
+    print(f"📩 Пришло сообщение: {message.text}")
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
