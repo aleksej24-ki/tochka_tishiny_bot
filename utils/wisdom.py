@@ -1,24 +1,10 @@
-import json
-import random
-
-WISDOM_FILE = "wisdoms.json"
-
-def load_wisdoms():
-    with open(WISDOM_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-def save_wisdoms(wisdoms):
-    with open(WISDOM_FILE, "w", encoding="utf-8") as f:
-        json.dump(wisdoms, f, ensure_ascii=False, indent=2)
-
-def add_wisdom(text):
-    wisdoms = load_wisdoms()
-    if text.lower().strip() in [w.lower().strip() for w in wisdoms]:
-        return False
-    wisdoms.append(text)
-    save_wisdoms(wisdoms)
-    return True
-
 def get_random_wisdom():
-    wisdoms = load_wisdoms()
+    wisdoms = [
+        "Настоящее — единственное, что реально.",
+        "Мысли — не ты. Наблюдай, не вовлекайся.",
+        "Вдох — начало. Выдох — отпускание.",
+        "Позволь быть. Себе. Другим. Миру.",
+        "Ты — не шум мыслей. Ты — их тишина."
+    ]
+    import random
     return random.choice(wisdoms)
