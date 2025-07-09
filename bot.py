@@ -43,9 +43,11 @@ def send_wisdom(msg):
 # Кнопка — Притча
 @bot.message_handler(func=lambda msg: msg.text == "📖 Притча")
 def send_parable(msg):
+    print("🚀 Кнопка 'Притча' нажата")
     text = get_random_parable()
+    print("📨 Отправка ответа пользователю")
     bot.send_message(msg.chat.id, f"📖 {text}")
-
+    
 # Webhook endpoint для Telegram
 @app.route(f"/{BOT_TOKEN}", methods=["POST"])
 def webhook():
