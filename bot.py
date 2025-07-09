@@ -1,16 +1,12 @@
 import os
-from flask import Flask, request
 import telebot
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
-
+from flask import Flask, request
 from utils.supabase_parables import get_random_parable
 from utils.wisdom import get_random_wisdom
 
 BOT_TOKEN = os.getenv("TELEGRAM_TOKEN")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
-
-if not BOT_TOKEN or not WEBHOOK_URL:
-    raise Exception("❌ Отсутствуют переменные TELEGRAM_TOKEN или WEBHOOK_URL")
 
 bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
@@ -18,10 +14,7 @@ app = Flask(__name__)
 @bot.message_handler(commands=["start"])
 def send_welcome(message):
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add(
-        KeyboardButton("🧘 Получить истину"),
-        KeyboardButton("📖 Притча")
-    )
+    markup.add(KeyboardButton("🧘 Получить истину"), KeyboardButton("📖 Притча"))
     bot.send_message(
         message.chat.id,
         "Добро пожаловать в *Точку тишины*. Выберите:",
@@ -29,15 +22,13 @@ def send_welcome(message):
         reply_markup=markup
     )
 
-@bot.message_handler(func=lambda msg: msg.text == "📖 Притча")
-def send_parable(msg):
-    text = get_random_parable()
-    bot.send_message(msg.chat.id, f"📖 {text}")
-
 @bot.message_handler(func=lambda msg: msg.text == "🧘 Получить истину")
 def send_wisdom(msg):
-    text = get_random_wisdom()
-    bot.send_message(msg.chat.id, f"🕯 {text}")
+    bot.send_message(msg.chat.id, f"🕯 {get_random_wisdom()}")
+
+@bot.message_handler(func=lambda msg: msg.text == "📖 Притча")
+def send_parable(msg):
+    bot.send_message(msg.chat.id, f"📖 {get_random_parable()}")
 
 @app.route(f"/{BOT_TOKEN}", methods=["POST"])
 def webhook():
