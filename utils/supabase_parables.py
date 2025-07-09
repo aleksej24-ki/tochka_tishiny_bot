@@ -37,7 +37,7 @@ def get_random_parable():
 
     except Exception as e:
         print("❌ Ошибка при получении притчи:", str(e))  # ⬅️ ЭТА СТРОКА
-    return "📖📖❌Не удалось получить притчу. Попробуй позже."
+        return "📖📖❌Не удалось получить притчу. Попробуй позже."
 
     finally:
         try:
