@@ -1,48 +1,36 @@
 import os
+import requests
 import random
-import psycopg2
 
-def get_connection():
-    db_url = os.getenv("SUPABASE_DB_URL")
-    print("📡 URL подключения к базе:", db_url)  # ⬅️ ЭТА СТРОКА ДЛЯ ОТЛАДКИ
-    if not db_url:
-        raise Exception("❌ SUPABASE_DB_URL не найден в переменных окружения!")
-    return psycopg2.connect(db_url)
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 
 def get_random_parable():
     try:
-        print("🔄 Получение случайной притчи из базы...")
-        conn = get_connection()
-        print("✅ Подключение к базе прошло успешно")
+        print("🔄 Получение случайной притчи через REST API...")
 
-        cur = conn.cursor()
-        cur.execute("SELECT COUNT(*) FROM parables;")
-        total = cur.fetchone()[0]
-        print(f"📦 Найдено притч: {total}")
+        headers = {
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization": f"Bearer {SUPABASE_ANON_KEY}"
+        }
 
-        if total == 0:
+        # Получаем все притчи
+        response = requests.get(
+            f"{SUPABASE_URL}/rest/v1/parables?select=text",
+            headers=headers
+        )
+
+        if response.status_code != 200:
+            print("❌ Ошибка при запросе:", response.text)
+            return "📖❌ Не удалось получить притчу. Попробуй позже."
+
+        parables = response.json()
+        if not parables:
             return "❗ В базе нет ни одной притчи."
 
-        offset = random.randint(0, total - 1)
-        print(f"🎯 Выбираем притчу с offset={offset}")
-        cur.execute("SELECT text FROM parables OFFSET %s LIMIT 1;", (offset,))
-        result = cur.fetchone()
-
-        if result:
-            print("✅ Притча найдена и возвращается")
-            return result[0]
-        else:
-            print("❗ Притча не найдена по offset")
-            return "❗ Притча не найдена."
+        parable = random.choice(parables)
+        return parable["text"]
 
     except Exception as e:
-        print("❌ Ошибка при получении притчи:", str(e))  # ⬅️ ЭТА СТРОКА
-        return "📖📖❌Не удалось получить притчу. Попробуй позже."
-
-    finally:
-        try:
-            if conn:
-                conn.close()
-                print("🔒 Соединение закрыто")
-        except Exception as close_error:
-            print("⚠️ Ошибка при закрытии соединения:", str(close_error))
+        print("❌ Ошибка:", str(e))
+        return "📖❌ Не удалось получить притчу. Попробуй позже."
