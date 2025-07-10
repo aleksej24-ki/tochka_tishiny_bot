@@ -7,9 +7,13 @@ print("🗂 Абсолютный путь к wisdom.json:", FILE_PATH)
 
 def load_wisdoms():
     try:
+        print("🟡 Путь к файлу:", FILE_PATH)
         with open(FILE_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
+            data = json.load(f)
+            print("📘 Загружено мудростей:", len(data))
+            return data
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        print("❌ Ошибка при загрузке мудростей:", str(e))
         return []
 
 def save_wisdoms(data):
