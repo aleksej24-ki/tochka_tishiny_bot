@@ -1,7 +1,7 @@
 import json
 import os
 
-FILE_PATH = os.path.join(os.path.dirname(__file__), "wisdom.json")
+FILE_PATH = os.path.join(os.getcwd(), "wisdom.json")
 
 print("🗂 Абсолютный путь к wisdom.json:", FILE_PATH)
 
