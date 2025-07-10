@@ -5,7 +5,7 @@ from flask import Flask, request
 from utils.supabase_parables import get_random_parable
 from utils.wisdom import get_random_wisdom
 from utils.wisdom_admin import add_wisdom, delete_wisdom, count_wisdoms
-
+from utils.wisdom_admin import list_wisdoms
 
 ADMIN_ID = 708145081  # <-- замени на свой Telegram ID
 
@@ -14,6 +14,22 @@ WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
 bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
+
+@bot.message_handler(commands=["list"])
+def handle_list(message):
+    if message.from_user.id != ADMIN_ID:
+        bot.send_message(message.chat.id, "🚫 Доступ запрещён.")
+        return
+
+    response = list_wisdoms()
+
+    # Ограничим длину одного сообщения (Telegram лимит ~4096 символов)
+    if len(response) < 4000:
+        bot.send_message(message.chat.id, response)
+    else:
+        parts = [response[i:i+4000] for i in range(0, len(response), 4000)]
+        for part in parts:
+            bot.send_message(message.chat.id, part)
 
 @bot.message_handler(commands=["start"])
 def send_welcome(message):
