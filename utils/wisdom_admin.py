@@ -3,7 +3,7 @@ import os
 
 FILE_PATH = os.path.join(os.path.dirname(__file__), "wisdom.json")
 
-print("🗂 Абсолютный путь к wisdom.json:", os.path.join(os.getcwd(), "wisdom.json"))
+print("🗂 Абсолютный путь к wisdom.json:", FILE_PATH)
 
 def load_wisdoms():
     try:
