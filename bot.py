@@ -6,6 +6,7 @@ from utils.supabase_parables import get_random_parable
 from utils.wisdom import get_random_wisdom
 from utils.wisdom_admin import add_wisdom, delete_wisdom, count_wisdoms
 from utils.wisdom_admin import list_wisdoms
+from utils.supabase_users import save_user
 
 ADMIN_ID = 708145081  # <-- замени на свой Telegram ID
 
@@ -14,6 +15,11 @@ WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
 bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
+
+@bot.message_handler(func=lambda msg: msg.text == "🧘 Получить истину")
+def send_wisdom(msg):
+    save_user(msg.from_user)
+    bot.send_message(msg.chat.id, f"🕯 {get_random_wisdom()}")
 
 @bot.message_handler(commands=["list"])
 def handle_list(message):
