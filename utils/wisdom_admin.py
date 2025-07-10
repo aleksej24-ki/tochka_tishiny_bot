@@ -1,7 +1,7 @@
 import json
 import os
 
-FILE_PATH = os.path.join("utils", "wisdom.json")
+FILE_PATH = os.path.join("..", "wisdom.json")
 
 def load_wisdoms():
     try:
