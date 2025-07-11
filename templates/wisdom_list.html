@@ -1,27 +1,83 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Мудрости</title>
+    <meta charset="UTF-8">
+    <title>Список мудростей</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 2rem;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            color: #444;
+        }
+
+        form {
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 0.5rem;
+            font-size: 1rem;
+        }
+
+        button, input[type="submit"] {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .wisdom {
+            background-color: white;
+            margin-bottom: 0.5rem;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .wisdom span {
+            flex: 1;
+            margin-right: 1rem;
+        }
+
+        .wisdom form {
+            margin: 0;
+        }
+
+        .wisdom form button {
+            background-color: #e53935;
+        }
+    </style>
 </head>
 <body>
-  <h1>🧠 Список мудростей ({{ wisdoms|length }})</h1>
+    <h1>🧠 Список мудростей ({{ wisdoms | length }})</h1>
 
-  <form method="post">
-    <input type="text" name="new_wisdom" placeholder="Новая мудрость" required>
-    <button type="submit">➕ Добавить</button>
-  </form>
+    <form method="post">
+        <input type="text" name="wisdom" placeholder="Новая мудрость" required>
+        <input type="submit" value="➕ Добавить">
+    </form>
 
-  <ul>
-    {% for wisdom in wisdoms %}
-      <li>
-        {{ loop.index }}. {{ wisdom }}
-        <form action="{{ url_for('delete_wisdom', index=loop.index0) }}" method="post" style="display:inline;">
-          <button type="submit">🗑 Удалить</button>
+    {% for w in wisdoms %}
+    <div class="wisdom">
+        <span>{{ loop.index }}. {{ w }}</span>
+        <form action="{{ url_for('delete_wisdom', index=loop.index0) }}" method="post">
+            <button type="submit">Удалить</button>
         </form>
-      </li>
+    </div>
     {% endfor %}
-  </ul>
 </body>
 </html>
-
