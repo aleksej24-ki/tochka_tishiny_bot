@@ -4,6 +4,10 @@ import os
 
 app = Flask(__name__)
 
+@app.route("/")
+def index():
+    return "<h2>Добро пожаловать в админ-панель Точки тишины</h2>"
+
 WISDOM_FILE = os.path.join(os.getcwd(), "wisdom.json")
 
 def load_wisdoms():
