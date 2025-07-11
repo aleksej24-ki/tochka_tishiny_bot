@@ -8,7 +8,7 @@ from utils.wisdom import get_random_wisdom
 from utils.wisdom_admin import add_wisdom, delete_wisdom, count_wisdoms, list_wisdoms
 from utils.supabase_users import save_user, increment_counter
 from api import api
-app.register_blueprint(api)
+
 
 ADMIN_ID = 708145081  # <-- замени на свой Telegram ID
 
@@ -18,6 +18,8 @@ WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
 
+app.register_blueprint(api)
+print("✅ API Blueprint зарегистрирован!")
 
 @bot.message_handler(commands=["start"])
 def send_welcome(message):
