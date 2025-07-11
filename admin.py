@@ -4,43 +4,42 @@ import os
 
 app = Flask(__name__)
 
-@app.route("/")
-def index():
-    return "<h2>Добро пожаловать в админ-панель Точки тишины</h2>"
-
-WISDOM_FILE = os.path.join(os.getcwd(), "wisdom.json")
+WISDOM_PATH = "wisdom.json"
 
 def load_wisdoms():
-    if not os.path.exists(WISDOM_FILE):
+    if not os.path.exists(WISDOM_PATH):
         return []
-    with open(WISDOM_FILE, "r", encoding="utf-8") as f:
+    with open(WISDOM_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def save_wisdoms(wisdoms):
-    with open(WISDOM_FILE, "w", encoding="utf-8") as f:
-        json.dump(wisdoms, f, ensure_ascii=False, indent=2)
+def save_wisdoms(data):
+    with open(WISDOM_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+@app.route("/")
+def index():
+    return render_template("index.html")
 
 @app.route("/wisdoms", methods=["GET", "POST"])
 def list_wisdoms():
+    wisdoms = load_wisdoms()
     if request.method == "POST":
-        new_wisdom = request.form.get("new_wisdom", "").strip()
-        if new_wisdom:
-            wisdoms = load_wisdoms()
-            if new_wisdom not in wisdoms:
-                wisdoms.append(new_wisdom)
+        text = request.form.get("wisdom", "").strip()
+        if text:
+            if text not in wisdoms:
+                wisdoms.append(text)
                 save_wisdoms(wisdoms)
         return redirect(url_for("list_wisdoms"))
-
-    wisdoms = load_wisdoms()
     return render_template("wisdom_list.html", wisdoms=wisdoms)
 
-@app.route("/delete/<int:index>", methods=["POST"])
+@app.route("/wisdoms/delete/<int:index>", methods=["POST"])
 def delete_wisdom(index):
     wisdoms = load_wisdoms()
     if 0 <= index < len(wisdoms):
-        wisdoms.pop(index)
+        del wisdoms[index]
         save_wisdoms(wisdoms)
     return redirect(url_for("list_wisdoms"))
 
 if __name__ == "__main__":
     app.run(debug=True)
+
