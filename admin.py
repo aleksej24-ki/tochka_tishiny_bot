@@ -1,39 +1,34 @@
-from flask import Flask, render_template, request, redirect
-import os
+from flask import Flask, render_template, request, redirect, url_for
 import json
+import os
 
 app = Flask(__name__)
-FILE_PATH = os.path.join(os.getcwd(), "wisdom.json")
+
+WISDOM_FILE = os.path.join(os.getcwd(), "wisdom.json")
 
 def load_wisdoms():
-    try:
-        with open(FILE_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
+    if not os.path.exists(WISDOM_FILE):
         return []
+    with open(WISDOM_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
 
-def save_wisdoms(data):
-    with open(FILE_PATH, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+def save_wisdoms(wisdoms):
+    with open(WISDOM_FILE, "w", encoding="utf-8") as f:
+        json.dump(wisdoms, f, ensure_ascii=False, indent=2)
 
-@app.route("/")
-def index():
-    return redirect("/wisdoms")
-
-@app.route("/wisdoms", methods=["GET"])
+@app.route("/wisdoms", methods=["GET", "POST"])
 def list_wisdoms():
+    if request.method == "POST":
+        new_wisdom = request.form.get("new_wisdom", "").strip()
+        if new_wisdom:
+            wisdoms = load_wisdoms()
+            if new_wisdom not in wisdoms:
+                wisdoms.append(new_wisdom)
+                save_wisdoms(wisdoms)
+        return redirect(url_for("list_wisdoms"))
+
     wisdoms = load_wisdoms()
     return render_template("wisdom_list.html", wisdoms=wisdoms)
-
-@app.route("/add", methods=["POST"])
-def add_wisdom():
-    new = request.form.get("wisdom", "").strip()
-    if new:
-        wisdoms = load_wisdoms()
-        if new not in wisdoms:  # защита от дубликатов
-            wisdoms.append(new)
-            save_wisdoms(wisdoms)
-    return redirect("/wisdoms")
 
 @app.route("/delete/<int:index>", methods=["POST"])
 def delete_wisdom(index):
@@ -41,7 +36,7 @@ def delete_wisdom(index):
     if 0 <= index < len(wisdoms):
         wisdoms.pop(index)
         save_wisdoms(wisdoms)
-    return redirect("/wisdoms")
+    return redirect(url_for("list_wisdoms"))
 
 if __name__ == "__main__":
     app.run(debug=True)
