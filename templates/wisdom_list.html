@@ -1,43 +1,110 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>Мудрости</title>
-    <style>
-        body { font-family: sans-serif; margin: 20px; }
-        .topbar { display: flex; justify-content: space-between; align-items: center; }
-        input, button { padding: 5px 10px; }
-        .wisdom-item { margin-bottom: 8px; }
-        .delete { margin-left: 10px; color: red; text-decoration: none; }
-    </style>
+  <meta charset="UTF-8">
+  <title>🧘 Мудрости | Admin</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 30px;
+      background: #f9f9f9;
+      color: #333;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+    .topbar form {
+      display: flex;
+      gap: 10px;
+    }
+    .button, input[type="text"] {
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .button {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .button:hover {
+      background-color: #45a049;
+    }
+    .logout-link {
+      color: #999;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .logout-link:hover {
+      color: #333;
+    }
+    .wisdom-form {
+      margin-bottom: 20px;
+    }
+    .message {
+      margin: 10px 0;
+      padding: 10px;
+      background-color: #dff0d8;
+      border-left: 5px solid #4CAF50;
+    }
+    .wisdom-item {
+      margin: 8px 0;
+      padding: 8px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .delete {
+      float: right;
+      color: #d00;
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .delete:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-    <div class="topbar">
-        <form method="GET" action="{{ url_for('list_wisdoms') }}">
-            <input type="text" name="q" placeholder="Поиск..." value="{{ query }}">
-            <button type="submit">🔍</button>
-        </form>
-        <a href="{{ url_for('logout') }}">🚪 Выйти</a>
-    </div>
 
-    <form method="POST">
-        <input type="text" name="new_wisdom" placeholder="Новая мудрость">
-        <button type="submit">➕ Добавить</button>
+  <div class="topbar">
+    <form method="GET" action="{{ url_for('list_wisdoms') }}">
+      <input type="text" name="q" placeholder="Поиск мудрости..." value="{{ query }}">
+      <button type="submit" class="button">🔍 Поиск</button>
     </form>
+    <a href="{{ url_for('logout') }}" class="logout-link">🚪 Выйти</a>
+  </div>
 
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul>{% for m in messages %}<li>{{ m }}</li>{% endfor %}</ul>
-      {% endif %}
-    {% endwith %}
+  <form method="POST" class="wisdom-form">
+    <input type="text" name="new_wisdom" placeholder="Новая мудрость...">
+    <button type="submit" class="button">➕ Добавить</button>
+  </form>
 
-    <h3>🧘 Мудрости ({{ wisdoms|length }})</h3>
-    {% for w in wisdoms %}
-        <div class="wisdom-item">
-            {{ loop.index }}. {{ w }}
-            <a href="{{ url_for('delete_wisdom', index=loop.index0) }}" class="delete">удалить</a>
-        </div>
-    {% else %}
-        <p>Нет мудростей.</p>
-    {% endfor %}
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="message">
+        {% for m in messages %}
+          <div>{{ m }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <h3>📜 Список мудростей ({{ wisdoms|length }})</h3>
+
+  {% for w in wisdoms %}
+    <div class="wisdom-item">
+      {{ loop.index }}. {{ w }}
+      <a href="{{ url_for('delete_wisdom', index=loop.index0) }}" class="delete">Удалить</a>
+    </div>
+  {% else %}
+    <p>😔 Мудростей пока нет.</p>
+  {% endfor %}
+
 </body>
 </html>
