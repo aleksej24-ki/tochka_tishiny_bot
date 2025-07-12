@@ -2,38 +2,77 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Мудрости | Admin</title>
+    <title>🧠 Список мудростей</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 90px;
+        }
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: white;
+            border-bottom: 1px solid #ddd;
+            z-index: 1000;
+            padding: 10px 0;
+        }
+        .wisdom-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .wisdom-text {
+            flex: 1;
+            margin-right: 15px;
+        }
+    </style>
 </head>
-<body style="font-family: sans-serif; margin: 0; background-color: #f8f9fa;">
-
-<!-- Навигация -->
-<nav style="background-color: #343a40; padding: 12px 20px; color: white; display: flex; justify-content: space-between; align-items: center;">
-    <div style="display: flex; align-items: center;">
-        <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" width="32" height="32" style="margin-right: 10px;">
-        <strong>Точка Тишины — Admin</strong>
+<body>
+<nav class="navbar shadow-sm">
+    <div class="container d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">🧠 Список мудростей ({{ wisdoms|length }})</h4>
+        <a href="/logout" class="btn btn-outline-danger btn-sm">Выйти</a>
     </div>
-    <a href="{{ url_for('logout') }}" style="background-color: #dc3545; padding: 8px 14px; color: white; border-radius: 6px; text-decoration: none;">
-        Выйти
-    </a>
 </nav>
 
-<div style="max-width: 700px; margin: 30px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-    <h2 style="margin-top: 0;">📜 Мудрости ({{ wisdoms|length }})</h2>
-
-    <form method="post" action="/add" style="margin-bottom: 20px;">
-        <input type="text" name="wisdom" placeholder="Добавить мудрость" required style="width: 70%; padding: 8px;">
-        <button type="submit" style="padding: 8px 12px;">Добавить</button>
+<div class="container">
+    <form method="POST" class="input-group mb-3 mt-2">
+        <input type="text" name="wisdom" class="form-control" placeholder="Новая мудрость" required>
+        <button type="submit" class="btn btn-primary">➕ Добавить</button>
     </form>
 
-    <ul style="list-style: none; padding: 0;">
-        {% for w in wisdoms %}
-        <li style="padding: 8px 0; border-bottom: 1px solid #eee;">
-            {{ loop.index }}. {{ w }}
-            <a href="/delete/{{ loop.index0 }}" style="color: red; float: right;">Удалить</a>
-        </li>
+    <input type="text" id="search" class="form-control mb-4" placeholder="🔍 Поиск по мудростям...">
+
+    <div id="wisdom-list">
+        {% for i, wisdom in enumerate(wisdoms, start=1) %}
+            <div class="wisdom-item">
+                <div class="wisdom-text"><strong>{{ i }}.</strong> {{ wisdom }}</div>
+                <form method="POST" action="/delete/{{ i-1 }}">
+                    <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                </form>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
 </div>
 
+<script>
+    const searchInput = document.getElementById('search');
+    const wisdomItems = document.querySelectorAll('.wisdom-item');
+
+    searchInput.addEventListener('input', function () {
+        const query = this.value.toLowerCase();
+        wisdomItems.forEach(item => {
+            const text = item.querySelector('.wisdom-text').innerText.toLowerCase();
+            item.style.display = text.includes(query) ? 'flex' : 'none';
+        });
+    });
+</script>
 </body>
 </html>
