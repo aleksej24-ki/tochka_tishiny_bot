@@ -1,43 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Админ-панель мудростей</title>
-  <style>
-    body { font-family: sans-serif; padding: 20px; max-width: 700px; margin: auto; }
-    input[type="text"] { width: 70%; }
-    ul { padding: 0; list-style: none; }
-    li { margin-bottom: 10px; }
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-  </style>
+    <title>Мудрости</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; }
+        input, button { padding: 5px 10px; }
+        .wisdom-item { margin-bottom: 8px; }
+        .delete { margin-left: 10px; color: red; text-decoration: none; }
+    </style>
 </head>
 <body>
-  <div class="top-bar">
-    <form method="get" action="{{ url_for('list_wisdoms') }}">
-      <input type="text" name="search" placeholder="🔍 Поиск..." value="{{ search or '' }}">
-      <button type="submit">Найти</button>
+    <div class="topbar">
+        <form method="GET" action="{{ url_for('list_wisdoms') }}">
+            <input type="text" name="q" placeholder="Поиск..." value="{{ query }}">
+            <button type="submit">🔍</button>
+        </form>
+        <a href="{{ url_for('logout') }}">🚪 Выйти</a>
+    </div>
+
+    <form method="POST">
+        <input type="text" name="new_wisdom" placeholder="Новая мудрость">
+        <button type="submit">➕ Добавить</button>
     </form>
-    <a href="{{ url_for('logout') }}">🚪 Выйти</a>
-  </div>
 
-  <form method="post">
-    <input type="text" name="new_wisdom" placeholder="Добавить мудрость">
-    <button type="submit">➕ Добавить</button>
-  </form>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>{% for m in messages %}<li>{{ m }}</li>{% endfor %}</ul>
+      {% endif %}
+    {% endwith %}
 
-  <h3>🧠 Список мудростей ({{ wisdoms|length }})</h3>
-  <ul>
+    <h3>🧘 Мудрости ({{ wisdoms|length }})</h3>
     {% for w in wisdoms %}
-      <li>
-        {{ loop.index }}. {{ w }}
-        <a href="{{ url_for('delete', index=loop.index0) }}">❌</a>
-      </li>
+        <div class="wisdom-item">
+            {{ loop.index }}. {{ w }}
+            <a href="{{ url_for('delete_wisdom', index=loop.index0) }}" class="delete">удалить</a>
+        </div>
+    {% else %}
+        <p>Нет мудростей.</p>
     {% endfor %}
-  </ul>
 </body>
 </html>
