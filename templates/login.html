@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Админ-панель — Вход</title>
+    <title>Вход</title>
 </head>
 <body>
-  <h2>🔐 Вход в админ-панель</h2>
-  {% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
-  <form method="post">
-    <input type="password" name="password" placeholder="Пароль">
-    <button type="submit">Войти</button>
-  </form>
+    <h2>🔐 Вход</h2>
+    <form method="POST">
+        <input type="password" name="password" placeholder="Пароль">
+        <button type="submit">Войти</button>
+    </form>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>{% for m in messages %}<li>{{ m }}</li>{% endfor %}</ul>
+      {% endif %}
+    {% endwith %}
 </body>
 </html>
