@@ -2,82 +2,38 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Список мудростей</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: auto;
-            padding: 2rem;
-            background-color: #f9f9f9;
-        }
-
-        h1 {
-            color: #444;
-        }
-
-        form {
-            margin-bottom: 1.5rem;
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        input[type="text"] {
-            flex: 1;
-            padding: 0.5rem;
-            font-size: 1rem;
-        }
-
-        button, input[type="submit"] {
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-            background-color: #4285f4;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .wisdom {
-            background-color: white;
-            margin-bottom: 0.5rem;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .wisdom span {
-            flex: 1;
-            margin-right: 1rem;
-        }
-
-        .wisdom form {
-            margin: 0;
-        }
-
-        .wisdom form button {
-            background-color: #e53935;
-        }
-    </style>
+    <title>Мудрости | Admin</title>
 </head>
-<body>
-    <h1>🧠 Список мудростей ({{ wisdoms | length }})</h1>
+<body style="font-family: sans-serif; margin: 0; background-color: #f8f9fa;">
 
-    <form method="post">
-        <input type="text" name="wisdom" placeholder="Новая мудрость" required>
-        <input type="submit" value="➕ Добавить">
+<!-- Навигация -->
+<nav style="background-color: #343a40; padding: 12px 20px; color: white; display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; align-items: center;">
+        <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" width="32" height="32" style="margin-right: 10px;">
+        <strong>Точка Тишины — Admin</strong>
+    </div>
+    <a href="{{ url_for('logout') }}" style="background-color: #dc3545; padding: 8px 14px; color: white; border-radius: 6px; text-decoration: none;">
+        Выйти
+    </a>
+</nav>
+
+<div style="max-width: 700px; margin: 30px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    <h2 style="margin-top: 0;">📜 Мудрости ({{ wisdoms|length }})</h2>
+
+    <form method="post" action="/add" style="margin-bottom: 20px;">
+        <input type="text" name="wisdom" placeholder="Добавить мудрость" required style="width: 70%; padding: 8px;">
+        <button type="submit" style="padding: 8px 12px;">Добавить</button>
     </form>
 
-    {% for w in wisdoms %}
-    <div class="wisdom">
-        <span>{{ loop.index }}. {{ w }}</span>
-        <form action="{{ url_for('delete_wisdom', index=loop.index0) }}" method="post">
-            <button type="submit">Удалить</button>
-        </form>
-    </div>
-    {% endfor %}
+    <ul style="list-style: none; padding: 0;">
+        {% for w in wisdoms %}
+        <li style="padding: 8px 0; border-bottom: 1px solid #eee;">
+            {{ loop.index }}. {{ w }}
+            <a href="/delete/{{ loop.index0 }}" style="color: red; float: right;">Удалить</a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
 </body>
 </html>
