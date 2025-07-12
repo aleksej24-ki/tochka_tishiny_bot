@@ -12,45 +12,44 @@
       color: #333;
     }
 
-    .container {
-      max-width: 800px;
-      margin: 100px auto 30px;
-      padding: 0 20px;
-    }
-
     .topbar {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      height: 70px;
       background-color: #ffffff;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      padding: 15px 20px;
+      padding: 10px 15px;
       display: flex;
-      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
       align-items: center;
+      justify-content: space-between;
       z-index: 999;
     }
 
     .topbar form {
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
-    input[type="text"], .button {
-      padding: 8px 14px;
+    .topbar input[type="text"] {
+      padding: 8px;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 14px;
+      min-width: 180px;
     }
 
     .button {
       background-color: #4CAF50;
       color: white;
-      cursor: pointer;
       border: none;
-      transition: background 0.3s ease;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
     }
 
     .button:hover {
@@ -58,19 +57,19 @@
     }
 
     .logout-link {
-      color: #666;
-      text-decoration: none;
       font-size: 14px;
+      text-decoration: none;
+      color: #555;
     }
 
     .logout-link:hover {
       color: #000;
     }
 
-    .wisdom-form {
-      margin-bottom: 20px;
-      display: flex;
-      gap: 10px;
+    .container {
+      max-width: 800px;
+      margin: 110px auto 30px;
+      padding: 0 20px;
     }
 
     .message {
@@ -80,10 +79,6 @@
       border-left: 4px solid #28a745;
       color: #155724;
       border-radius: 4px;
-    }
-
-    .wisdom-list {
-      margin-top: 20px;
     }
 
     .wisdom-item {
@@ -110,11 +105,40 @@
       border-radius: 4px;
       font-size: 12px;
       cursor: pointer;
-      transition: background 0.3s;
     }
 
     .delete-button:hover {
       background-color: #c0392b;
+    }
+
+    @media (max-width: 500px) {
+      .wisdom-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .delete-button {
+        margin-top: 6px;
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .topbar form {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .topbar input[type="text"],
+      .button {
+        width: 100%;
+      }
+
+      .logout-link {
+        align-self: flex-end;
+      }
     }
 
   </style>
@@ -126,15 +150,16 @@
       <input type="text" name="q" placeholder="Поиск мудрости..." value="{{ query }}">
       <button type="submit" class="button">🔍 Поиск</button>
     </form>
-    <a href="{{ url_for('logout') }}" class="logout-link">🚪 Выйти</a>
-  </div>
 
-  <div class="container">
-    <form method="POST" class="wisdom-form">
+    <form method="POST" action="{{ url_for('list_wisdoms') }}">
       <input type="text" name="new_wisdom" placeholder="Новая мудрость..." required>
       <button type="submit" class="button">➕ Добавить</button>
     </form>
 
+    <a href="{{ url_for('logout') }}" class="logout-link">🚪 Выйти</a>
+  </div>
+
+  <div class="container">
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <div class="message">
@@ -145,21 +170,8 @@
       {% endif %}
     {% endwith %}
 
-    <div class="wisdom-list">
-      <h3>📜 Список мудростей ({{ wisdoms|length }})</h3>
+    <h3>📜 Список мудростей ({{ wisdoms|length }})</h3>
 
-      {% for w in wisdoms %}
-        <div class="wisdom-item">
-          <div class="wisdom-text">{{ loop.index }}. {{ w }}</div>
-          <form method="POST" action="{{ url_for('delete_wisdom', index=loop.index0) }}">
-            <button type="submit" class="delete-button">🗑 Удалить</button>
-          </form>
-        </div>
-      {% else %}
-        <p>😔 Пока нет мудростей.</p>
-      {% endfor %}
-    </div>
-  </div>
-
-</body>
-</html>
+    {% for w in wisdoms %}
+      <div class="wisdom-item">
+        <div class="wisdom-text">{{ loop.index
