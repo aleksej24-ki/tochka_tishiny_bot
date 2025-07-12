@@ -1,66 +1,68 @@
 import os
-from flask import Flask, render_template, request, redirect, session, url_for
 import json
+from flask import Flask, request, render_template, redirect, url_for, session
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv("ADMIN_SECRET_KEY", "dev-secret")
-
+app.secret_key = "super-secret-key"  # Можно заменить
 WISDOM_FILE = "wisdom.json"
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+
 
 def load_wisdoms():
-    if os.path.exists(WISDOM_FILE):
-        with open(WISDOM_FILE, encoding="utf-8") as f:
-            return json.load(f)
-    return []
+    if not os.path.exists(WISDOM_FILE):
+        return []
+    with open(WISDOM_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
 
-def save_wisdoms(data):
+
+def save_wisdoms(wisdoms):
     with open(WISDOM_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+        json.dump(wisdoms, f, ensure_ascii=False, indent=2)
 
-@app.route("/")
-def index():
-    if not session.get("logged_in"):
-        return redirect(url_for("login"))
-    return redirect(url_for("list_wisdoms"))
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        password = request.form.get("password")
-        if password == os.getenv("ADMIN_SECRET_KEY"):
-            session["logged_in"] = True
+        if request.form.get("password") == ADMIN_PASSWORD:
+            session["admin"] = True
             return redirect(url_for("list_wisdoms"))
-        return render_template("login.html", error="Неверный пароль")
+        return render_template("login.html", error="❌ Неверный пароль.")
     return render_template("login.html")
+
 
 @app.route("/logout")
 def logout():
-    session.clear()
+    session.pop("admin", None)
     return redirect(url_for("login"))
 
-@app.route("/wisdoms")
-def list_wisdoms():
-    if not session.get("logged_in"):
-        return redirect(url_for("login"))
-    wisdoms = load_wisdoms()
-    return render_template("wisdom_list.html", wisdoms=wisdoms)
 
-@app.route("/add", methods=["POST"])
-def add_wisdom():
-    if not session.get("logged_in"):
+@app.route("/wisdoms", methods=["GET", "POST"])
+def list_wisdoms():
+    if not session.get("admin"):
         return redirect(url_for("login"))
-    text = request.form.get("wisdom")
-    if text:
-        wisdoms = load_wisdoms()
-        if text not in wisdoms:
-            wisdoms.append(text)
+
+    wisdoms = load_wisdoms()
+    search = request.args.get("search", "").lower()
+    if search:
+        wisdoms = [w for w in wisdoms if search in w.lower()]
+
+    if request.method == "POST":
+        new_wisdom = request.form.get("new_wisdom", "").strip()
+        if new_wisdom and new_wisdom not in wisdoms:
+            wisdoms.append(new_wisdom)
             save_wisdoms(wisdoms)
-    return redirect(url_for("list_wisdoms"))
+            return redirect(url_for("list_wisdoms"))
+    return render_template("wisdom_list.html", wisdoms=wisdoms, search=search)
+
 
 @app.route("/delete/<int:index>")
-def delete_wisdom(index):
-    if not session.get("logged_in"):
+def delete(index):
+    if not session.get("admin"):
         return redirect(url_for("login"))
+
     wisdoms = load_wisdoms()
     if 0 <= index < len(wisdoms):
         del wisdoms[index]
