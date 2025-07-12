@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Вход | Admin</title>
+  <meta charset="UTF-8">
+  <title>Админ-панель — Вход</title>
 </head>
-<body style="font-family: sans-serif; background-color: #f2f2f2; text-align: center; padding-top: 80px;">
-    <h2>🔐 Вход в админ-панель</h2>
-    {% if error %}<p style="color: red;">{{ error }}</p>{% endif %}
-    <form method="post">
-        <input type="password" name="password" placeholder="Введите пароль" required style="padding: 10px; font-size: 16px;">
-        <button type="submit" style="padding: 10px 20px; font-size: 16px;">Войти</button>
-    </form>
+<body>
+  <h2>🔐 Вход в админ-панель</h2>
+  {% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+  <form method="post">
+    <input type="password" name="password" placeholder="Пароль">
+    <button type="submit">Войти</button>
+  </form>
 </body>
 </html>
