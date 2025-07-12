@@ -6,16 +6,31 @@
   <style>
     body {
       font-family: sans-serif;
-      margin: 30px;
+      margin: 0;
+      padding: 0;
       background: #f7f7f7;
       color: #333;
     }
 
+    .container {
+      max-width: 800px;
+      margin: 100px auto 30px;
+      padding: 0 20px;
+    }
+
     .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      background-color: #ffffff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      padding: 15px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      z-index: 999;
     }
 
     .topbar form {
@@ -101,6 +116,7 @@
     .delete-button:hover {
       background-color: #c0392b;
     }
+
   </style>
 </head>
 <body>
@@ -113,34 +129,36 @@
     <a href="{{ url_for('logout') }}" class="logout-link">🚪 Выйти</a>
   </div>
 
-  <form method="POST" class="wisdom-form">
-    <input type="text" name="new_wisdom" placeholder="Новая мудрость..." required>
-    <button type="submit" class="button">➕ Добавить</button>
-  </form>
+  <div class="container">
+    <form method="POST" class="wisdom-form">
+      <input type="text" name="new_wisdom" placeholder="Новая мудрость..." required>
+      <button type="submit" class="button">➕ Добавить</button>
+    </form>
 
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <div class="message">
-        {% for m in messages %}
-          <div>{{ m }}</div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="message">
+          {% for m in messages %}
+            <div>{{ m }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
 
-  <div class="wisdom-list">
-    <h3>📜 Список мудростей ({{ wisdoms|length }})</h3>
+    <div class="wisdom-list">
+      <h3>📜 Список мудростей ({{ wisdoms|length }})</h3>
 
-    {% for w in wisdoms %}
-      <div class="wisdom-item">
-        <div class="wisdom-text">{{ loop.index }}. {{ w }}</div>
-        <form method="POST" action="{{ url_for('delete_wisdom', index=loop.index0) }}">
-          <button type="submit" class="delete-button">🗑 Удалить</button>
-        </form>
-      </div>
-    {% else %}
-      <p>😔 Пока нет мудростей.</p>
-    {% endfor %}
+      {% for w in wisdoms %}
+        <div class="wisdom-item">
+          <div class="wisdom-text">{{ loop.index }}. {{ w }}</div>
+          <form method="POST" action="{{ url_for('delete_wisdom', index=loop.index0) }}">
+            <button type="submit" class="delete-button">🗑 Удалить</button>
+          </form>
+        </div>
+      {% else %}
+        <p>😔 Пока нет мудростей.</p>
+      {% endfor %}
+    </div>
   </div>
 
 </body>
